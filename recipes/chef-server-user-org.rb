@@ -1,5 +1,3 @@
-username = node['delivery_dev']['user']
-
 execute 'chef-server-ctl restart' do
   action :nothing
 end
@@ -12,12 +10,12 @@ file "#{cache_path}/chef-server-core.restart" do
   not_if do ::File.exists?("#{cache_path}/chef-server-core.restart") end
 end
 
-chef_server_user username do
+chef_server_user 'delivery' do
   firstname 'Example'
   lastname 'User'
-  email 'example@example.com'
+  email 'delivery@example.com'
   password username
-  private_key_path "/tmp/#{username}.pem"
+  private_key_path '/tmp/delivery.pem'
   action :create
 end
 
@@ -28,6 +26,6 @@ chef_server_org 'example' do
 end
 
 chef_server_org 'example' do
-  admins username
+  admins %w( delivery )
   action :add_admin
 end

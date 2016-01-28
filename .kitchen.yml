@@ -32,6 +32,7 @@ suites:
       - recipe[delivery_dev::vagrant_keys]
       - recipe[delivery_dev::chef-server]
       - recipe[delivery_dev::chef-server-user-org]
+      - recipe[delivery_dev::chef-server-upload-cookbooks]
     driver:
       network:
         - ['private_network', {ip: '33.33.33.10'}]
@@ -39,13 +40,17 @@ suites:
         memory: 2048
         cpus: 2
     attributes:
+
   - name: delivery
     excludes:
         - centos-6.7
     run_list:
       - recipe[delivery_dev::hostsfile]
       - recipe[delivery_dev::vagrant_keys]
+      - recipe[delivery_dev::delivery-builder-key]
+      - recipe[delivery_dev::delivery-license]
       - recipe[delivery_dev::delivery]
+      - recipe[delivery_dev::chef-server-manage-delivery]
     driver:
       network:
         - ['private_network', {ip: '33.33.33.11'}]
@@ -53,13 +58,16 @@ suites:
         memory: 4096
         cpus: 4
     attributes:
+
   - name: builder
     excludes:
         - centos-6.7
     run_list:
       - recipe[delivery_dev::hostsfile]
       - recipe[delivery_dev::vagrant_keys]
+      - recipe[delivery_dev::delivery-builder-key]
       - recipe[delivery_build::default]
+      - recipe[delivery_dev::chef-server-manage-builder]
     driver:
       network:
         - ['private_network', {ip: '33.33.33.12'}]
