@@ -5,7 +5,12 @@ hostsfile_entry '33.33.33.10' do
 end
 
 hostsfile_entry '33.33.33.11' do
-  hostname  'delivery.example.com'
+  hostname  'delivery-primary.example.com'
+  unique    true
+end
+
+hostsfile_entry '33.33.33.13' do
+  hostname  'delivery-secondary.example.com'
   unique    true
 end
 

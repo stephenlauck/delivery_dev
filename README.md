@@ -1,27 +1,16 @@
 # delivery_dev
 
-TODO: Enter the cookbook description here.
+### Usage
+Set an environment variable for the path to your Delivery repo if you want to compile the omnibus package locally:
 
-* build, sync converge could be streamlined
-* installing a package via dpkg is faster than rebuild/converging
-* no clear full converge commands for cluster
-* upgrade should be default in dev env for all packages so if package changes, it's upgraded with no code change 
-* should be able to run omnibus build vm and dev cluster at same time no problem re ports, size, and memory
-* all commands should be same for suspend/resume in Makefiles for omnibus and infra
-* dev install should be a public cookbook, not included in the delivery repo
-* omnibus and delivery on same giant VM for compiling and syncing
+`export DELIVERY_REPO=/home/lemmy/delivery`
 
+Build a local Delivery cluster using Kitchen for the OS you prefer (ubuntu/centos):
 
-ideas
-* make omnibus and infra same
+`kitchen converge centos`
 
-
-chef-server
-* chef-ingredient + config
-delivery-server
-* chef-ingredient + config
-builder
-* https://github.com/chef-cookbooks/delivery_build + config
-
-* kitchen + simple scp code to orchestrate
-* remove chef-provisioning
+```
+33.33.33.10 chef.example.com
+33.33.33.11 delivery.example.com
+33.33.33.12 build.example.com
+```

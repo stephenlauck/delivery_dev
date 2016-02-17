@@ -1,7 +1,7 @@
 execute "scp -i /root/.ssh/insecure_private_key -o StrictHostKeyChecking=no -r root@chef.example.com:/tmp/example-validator.pem /etc/chef/example-validator.pem"
 
 # copy delivery cert to build node trusted certs
-execute "scp -i /root/.ssh/insecure_private_key -o StrictHostKeyChecking=no -r root@delivery.example.com:/var/opt/delivery/nginx/ca/delivery.example.com.crt /etc/chef/trusted_certs/delivery.example.com.crt"
+execute "scp -i /root/.ssh/insecure_private_key -o StrictHostKeyChecking=no -r root@delivery-primary.example.com:/var/opt/delivery/nginx/ca/delivery-primary.example.com.crt /etc/chef/trusted_certs/delivery-primary.example.com.crt"
 
 
 file '/etc/chef/client.rb' do

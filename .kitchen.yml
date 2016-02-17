@@ -3,12 +3,18 @@ driver:
   name: vagrant
   ssh:
     insert_key: false
+  synced_folders:
+    - ['<%= ENV['DELIVERY_REPO'] %>', '/home/vagrant/delivery']
+    - ['<%= ENV['DELIVERY_REPO'] %>', '/mnt/sync/delivery']
 
 provisioner:
   name: chef_zero
   chef_zero_port: 9010
   encrypted_data_bag_secret_key_path: 'secrets/fakey-mcfakerton'
   data_bags_path: 'data_bags'
+  chef_client:
+    config:
+      log_level: ":debug"
 
 # Uncomment the following verifier to leverage Inspec instead of Busser (the
 # default verifier)
@@ -20,7 +26,13 @@ platforms:
     run_list:
       - recipe[apt::default]
       - recipe[apt-chef::default]
+  - name: ubuntu-15.04
+    run_list:
+      - recipe[apt::default]
+      - recipe[apt-chef::default]
   - name: centos-7.2
+    run_list:
+      - recipe[yum-epel::default]
   - name: centos-6.7
 
 suites:
@@ -41,7 +53,7 @@ suites:
         cpus: 2
     attributes:
 
-  - name: delivery
+  - name: delivery_primary
     excludes:
         - centos-6.7
     run_list:
@@ -51,13 +63,61 @@ suites:
       - recipe[delivery_dev::delivery-license]
       - recipe[delivery_dev::delivery]
       - recipe[delivery_dev::chef-server-manage-delivery]
+      - recipe[delivery_dev::consul]
+      <% if ENV['DELIVERY_REPO'] %>
+      - recipe[omnibus::default]
+      - recipe[omnibus-delivery::default]
+      <% end %>
     driver:
+      vm_hostname: delivery-primary.example.com
       network:
         - ['private_network', {ip: '33.33.33.11'}]
       customize:
+        <% if ENV['DELIVERY_REPO'] %>
         memory: 4096
         cpus: 4
+        <% else %>
+        memory: 2048
+        cpus: 2
+        <% end %>
     attributes:
+      omnibus:
+        build_user:  vagrant
+        build_dir:   /home/vagrant/delivery/omnibus
+        install_dir: /opt/dev_delivery
+
+  - name: delivery_secondary
+    excludes:
+        - centos-6.7
+    run_list:
+      - recipe[delivery_dev::hostsfile]
+      - recipe[delivery_dev::vagrant_keys]
+      - recipe[delivery_dev::delivery-builder-key]
+      - recipe[delivery_dev::delivery-license]
+      - recipe[delivery_dev::delivery]
+      - recipe[delivery_dev::chef-server-manage-delivery]
+      - recipe[consul]
+      <% if ENV['DELIVERY_REPO'] %>
+      - recipe[omnibus::default]
+      - recipe[omnibus-delivery::default]
+      <% end %>
+    driver:
+      vm_hostname: delivery-secondary.example.com
+      network:
+        - ['private_network', {ip: '33.33.33.13'}]
+      customize:
+        <% if ENV['DELIVERY_REPO'] %>
+        memory: 4096
+        cpus: 4
+        <% else %>
+        memory: 2048
+        cpus: 2
+        <% end %>
+    attributes:
+      omnibus:
+        build_user:  vagrant
+        build_dir:   /home/vagrant/delivery/omnibus
+        install_dir: /opt/dev_delivery
 
   - name: builder
     excludes:
