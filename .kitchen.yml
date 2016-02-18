@@ -42,6 +42,7 @@ suites:
       - recipe[delivery_dev::chef-server]
       - recipe[delivery_dev::chef-server-user-org]
       - recipe[delivery_dev::chef-server-upload-cookbooks]
+      - recipe[consul::default]
     driver:
       network:
         - ['private_network', {ip: '33.33.33.10'}]
@@ -49,6 +50,12 @@ suites:
         memory: 2048
         cpus: 2
     attributes:
+      consul:
+        config:
+          node_name: chef-server
+          bind_addr: 33.33.33.10
+          server: true
+          bootstrap_expect: 4
 
   - name: delivery-primary
     excludes:
@@ -60,6 +67,7 @@ suites:
       - recipe[delivery_dev::delivery-license]
       - recipe[delivery_dev::delivery]
       - recipe[delivery_dev::chef-server-manage-delivery]
+      - recipe[consul::default]
     driver:
       vm_hostname: delivery-primary.example.com
       network:
@@ -70,6 +78,12 @@ suites:
     attributes:
       delivery:
         fqdn: 'delivery-primary.example.com'
+      consul:
+        config:
+          node_name: delivery-primary
+          bind_addr: 33.33.33.11
+          start_join:
+            - 33.33.33.10
 
   - name: delivery-secondary
     excludes:
@@ -81,6 +95,7 @@ suites:
       - recipe[delivery_dev::delivery-license]
       - recipe[delivery_dev::delivery]
       - recipe[delivery_dev::chef-server-manage-delivery]
+      - recipe[consul::default]
     driver:
       vm_hostname: delivery-secondary.example.com
       network:
@@ -91,6 +106,12 @@ suites:
     attributes:
       delivery:
         fqdn: 'delivery-secondary.example.com'
+      consul:
+        config:
+          node_name: delivery-secondary
+          bind_addr: 33.33.33.13
+          start_join:
+            - 33.33.33.10
 
   - name: builder
     excludes:
@@ -101,6 +122,7 @@ suites:
       - recipe[delivery_dev::delivery-builder-key]
       - recipe[delivery_build::default]
       - recipe[delivery_dev::chef-server-manage-builder]
+      - recipe[consul::default]
     driver:
       network:
         - ['private_network', {ip: '33.33.33.12'}]
@@ -108,3 +130,9 @@ suites:
         memory: 2048
         cpus: 2
     attributes:
+      consul:
+        config:
+          node_name: builder
+          bind_addr: 33.33.33.12
+          start_join:
+            - 33.33.33.10
