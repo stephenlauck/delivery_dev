@@ -20,7 +20,7 @@ file '/etc/chef/dna.json' do
 {
     "delivery_build": {
         "trusted_certs": {
-            "delivery server cert": "/etc/chef/trusted_certs/delivery.example.com.crt"
+            "delivery server cert": "/etc/chef/trusted_certs/delivery-primary.example.com.crt"
         }
     },
     "run_list": [
