@@ -3,9 +3,6 @@ driver:
   name: vagrant
   ssh:
     insert_key: false
-  # synced_folders:
-  #   - ['<%= ENV['DELIVERY_REPO'] %>', '/home/vagrant/delivery']
-  #   - ['<%= ENV['DELIVERY_REPO'] %>', '/mnt/sync/delivery']
 
 provisioner:
   name: chef_zero
