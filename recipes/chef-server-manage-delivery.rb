@@ -20,7 +20,7 @@ file '/etc/chef/dna.json' do
   content <<-EOF
 {
     "delivery": {
-        "fqdn": "delivery.example.com",
+        "fqdn": "#{node['delivery']['fqdn']}",
         "chef_server": "https://chef.example.com/organizations/example"
     },
     "run_list": [
