@@ -1,6 +1,6 @@
 chef_ingredient "delivery" do
   config <<-EOS
-delivery_fqdn "delivery.example.com"
+delivery_fqdn "#{node['delivery']['fqdn']}"
 
 delivery['chef_username']    = "delivery"
 delivery['chef_private_key'] = "/etc/delivery/delivery.pem"

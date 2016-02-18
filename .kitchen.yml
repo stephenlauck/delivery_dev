@@ -3,9 +3,9 @@ driver:
   name: vagrant
   ssh:
     insert_key: false
-  synced_folders:
-    - ['<%= ENV['DELIVERY_REPO'] %>', '/home/vagrant/delivery']
-    - ['<%= ENV['DELIVERY_REPO'] %>', '/mnt/sync/delivery']
+  # synced_folders:
+  #   - ['<%= ENV['DELIVERY_REPO'] %>', '/home/vagrant/delivery']
+  #   - ['<%= ENV['DELIVERY_REPO'] %>', '/mnt/sync/delivery']
 
 provisioner:
   name: chef_zero
@@ -53,7 +53,7 @@ suites:
         cpus: 2
     attributes:
 
-  - name: delivery_primary
+  - name: delivery-primary
     excludes:
         - centos-6.7
     run_list:
@@ -63,30 +63,18 @@ suites:
       - recipe[delivery_dev::delivery-license]
       - recipe[delivery_dev::delivery]
       - recipe[delivery_dev::chef-server-manage-delivery]
-      - recipe[delivery_dev::consul]
-      <% if ENV['DELIVERY_REPO'] %>
-      - recipe[omnibus::default]
-      - recipe[omnibus-delivery::default]
-      <% end %>
     driver:
       vm_hostname: delivery-primary.example.com
       network:
         - ['private_network', {ip: '33.33.33.11'}]
       customize:
-        <% if ENV['DELIVERY_REPO'] %>
-        memory: 4096
-        cpus: 4
-        <% else %>
         memory: 2048
         cpus: 2
-        <% end %>
     attributes:
-      omnibus:
-        build_user:  vagrant
-        build_dir:   /home/vagrant/delivery/omnibus
-        install_dir: /opt/dev_delivery
+      delivery:
+        fqdn: 'delivery-primary.example.com'
 
-  - name: delivery_secondary
+  - name: delivery-secondary
     excludes:
         - centos-6.7
     run_list:
@@ -96,28 +84,16 @@ suites:
       - recipe[delivery_dev::delivery-license]
       - recipe[delivery_dev::delivery]
       - recipe[delivery_dev::chef-server-manage-delivery]
-      - recipe[consul]
-      <% if ENV['DELIVERY_REPO'] %>
-      - recipe[omnibus::default]
-      - recipe[omnibus-delivery::default]
-      <% end %>
     driver:
       vm_hostname: delivery-secondary.example.com
       network:
         - ['private_network', {ip: '33.33.33.13'}]
       customize:
-        <% if ENV['DELIVERY_REPO'] %>
-        memory: 4096
-        cpus: 4
-        <% else %>
         memory: 2048
         cpus: 2
-        <% end %>
     attributes:
-      omnibus:
-        build_user:  vagrant
-        build_dir:   /home/vagrant/delivery/omnibus
-        install_dir: /opt/dev_delivery
+      delivery:
+        fqdn: 'delivery-secondary.example.com'
 
   - name: builder
     excludes:
