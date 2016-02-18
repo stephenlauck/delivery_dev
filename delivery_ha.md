@@ -13,3 +13,10 @@ Strategies
 
 
 Flow of data:
+
+
+### kitchen delivery credentials
+
+`kitchen exec delivery-primary-cent -c 'cat /tmp/example.creds'`
+
+`kitchen exec delivery-secondary-cent -c 'cat /tmp/example.creds'`
