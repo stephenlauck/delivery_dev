@@ -108,6 +108,3 @@ suites:
         memory: 2048
         cpus: 2
     attributes:
-      delivery_build:
-        delivery-cli:
-          options: "--nogpgcheck"

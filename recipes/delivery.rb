@@ -13,7 +13,7 @@ EOS
 end
 
 ingredient_config "delivery" do
-  notifies :reconfigure, "chef_ingredient[delivery]"
+  notifies :reconfigure, "chef_ingredient[delivery]", :immediately
   notifies :run, "execute[create example enterprise]"
 end
 
