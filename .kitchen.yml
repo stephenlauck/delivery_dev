@@ -43,6 +43,7 @@ suites:
       - recipe[delivery_dev::chef-server-user-org]
       - recipe[delivery_dev::chef-server-upload-cookbooks]
       - recipe[consul::default]
+      - recipe[delivery_dev::consul-delivery-health-check]
     driver:
       network:
         - ['private_network', {ip: '33.33.33.10'}]
@@ -55,7 +56,7 @@ suites:
           node_name: chef-server
           bind_addr: 33.33.33.10
           server: true
-          bootstrap_expect: 4
+          bootstrap_expect: 1
 
   - name: delivery-primary
     excludes:
