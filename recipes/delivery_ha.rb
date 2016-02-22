@@ -62,7 +62,7 @@ else
   execute "remove_recovery" do
     command "rm /var/opt/delivery/postgresql/9.2/data/recovery.conf"
     action :nothing
-    only_if ::File.exist?("/var/opt/delivery/postgresql/9.2/data/recovery.conf")
+    only_if do ::File.exist?("/var/opt/delivery/postgresql/9.2/data/recovery.conf") end
   end
 
   template "/var/opt/delivery/postgresql/9.2/data/recovery.conf" do
