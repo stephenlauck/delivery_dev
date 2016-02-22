@@ -22,6 +22,21 @@ project.
 9. Refresh the secondary browser and you should land on the dashboard
 10. From here you can navigate around and see your org/project etc. Just remember only read ops work.
 
+Postgresql Failover
+===================
+Need to set path in recovery.conf for the failover file.
+
+1. touch failover file ex `touch /tmp/fail`
+2. switch over to point users to use secondary Delivery UI
+3. update delivery-cli to use secondary for delivery repos
+4. put Delivery primary in offline on UI and stop database
+5. secondary configures itself to be streaming to new hot standby?
+
+#### on secondary
+As the chef-pgsql user run the following command to failover:
+`/opt/delivery/embedded/bin/pg_ctl promote -D /var/opt/delivery/postgresql/9.2/data`
+
+
 What are the things we need to sync?
 
 * -postgresql
