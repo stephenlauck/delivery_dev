@@ -59,6 +59,7 @@ suites:
       - recipe[delivery_dev::delivery-builder-key]
       - recipe[delivery_dev::delivery-license]
       - recipe[delivery_dev::delivery]
+      - recipe[delivery_dev::delivery_ha]
       - recipe[delivery_dev::chef-server-manage-delivery]
     driver:
       vm_hostname: delivery-primary.example.com
@@ -70,6 +71,9 @@ suites:
     attributes:
       delivery:
         fqdn: 'delivery-primary.example.com'
+        nodes: ['33.33.33.11','33.33.33.13']
+      vagrant:
+        ipaddress: '33.33.33.11'
 
   - name: delivery-secondary
     excludes:
@@ -80,6 +84,7 @@ suites:
       - recipe[delivery_dev::delivery-builder-key]
       - recipe[delivery_dev::delivery-license]
       - recipe[delivery_dev::delivery]
+      - recipe[delivery_dev::delivery_ha]
       - recipe[delivery_dev::chef-server-manage-delivery]
     driver:
       vm_hostname: delivery-secondary.example.com
@@ -91,6 +96,9 @@ suites:
     attributes:
       delivery:
         fqdn: 'delivery-secondary.example.com'
+        nodes: ['33.33.33.11','33.33.33.13']
+      vagrant:
+        ipaddress: '33.33.33.13'
 
   - name: builder
     excludes:
