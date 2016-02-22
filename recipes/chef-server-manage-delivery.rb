@@ -21,12 +21,17 @@ file '/etc/chef/dna.json' do
 {
     "delivery": {
         "fqdn": "#{node['delivery']['fqdn']}",
-        "chef_server": "https://chef.example.com/organizations/example"
+        "chef_server": "https://chef.example.com/organizations/example",
+        "nodes": ["33.33.33.11","33.33.33.13"]
     },
     "run_list": [
         "recipe[delivery_dev::hostsfile]",
-        "recipe[delivery_dev::delivery]"
-    ]
+        "recipe[delivery_dev::delivery]",
+        "recipe[delivery_dev::delivery_ha]"
+    ],
+    "vagrant": {
+      "ipaddress": "#{node['vagrant']['ipaddress']}"
+    }
 }
   EOF
 end
