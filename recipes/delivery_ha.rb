@@ -1,27 +1,6 @@
-# set up shared delivery keys so the two delivery servers can rsync
-directory '/opt/delivery/embedded/.ssh' do
-  action :create
-  owner 'delivery'
-  group 'delivery'
-  mode '0700'
-end
+## Configure Postgesql
 
-cookbook_file '/opt/delivery/embedded/.ssh/insecure_private_key' do
-  action :create
-  owner 'delivery'
-  group 'delivery'
-  mode '0600'
-  source 'insecure_private_key'
-end
-
-cookbook_file '/opt/delivery/embedded/.ssh/authorized_keys' do
-  action :create
-  owner 'delivery'
-  group 'delivery'
-  mode '0600'
-  source 'insecure_public_key'
-end
-
+# we use rsync to move backups around
 package "rsync"
 
 if node['delivery']['fqdn'] == 'delivery-primary.example.com'
@@ -100,5 +79,108 @@ else
   execute "start_postgres" do
     command "delivery-ctl start postgresql"
     action :nothing
+  end
+end
+
+## Setup repo syncing
+# create repo dirs so we can setup sync
+# this really should happen in the installer
+directory '/var/opt/delivery/delivery/git_repos' do
+  action :create
+  owner 'delivery'
+  group 'delivery'
+end
+
+directory '/var/opt/delivery/delivery/git_workspace' do
+  action :create
+  owner 'delivery'
+  group 'delivery'
+end
+
+# Install lsyncd
+chef_gem "chef-rewind"
+require 'chef/rewind'
+
+include_recipe "lsyncd"
+
+# set up shared delivery keys so the two delivery servers can rsync
+# the order here is important otherwise sync will crash on the master since it
+# will get ssh access before rsync is installed
+directory '/opt/delivery/embedded/.ssh' do
+  action :create
+  owner 'delivery'
+  group 'delivery'
+  mode '0700'
+end
+
+cookbook_file '/opt/delivery/embedded/.ssh/insecure_private_key' do
+  action :create
+  owner 'delivery'
+  group 'delivery'
+  mode '0600'
+  source 'insecure_private_key'
+end
+
+cookbook_file '/opt/delivery/embedded/.ssh/authorized_keys' do
+  action :create
+  owner 'delivery'
+  group 'delivery'
+  mode '0600'
+  source 'insecure_public_key'
+end
+
+if node['delivery']['fqdn'] == 'delivery-primary.example.com'
+  # Setup syncs
+  lsyncd_target 'git_repos' do
+    mode 'rsync'
+    user 'delivery'
+    host 'delivery-secondary.example.com'
+    source '/var/opt/delivery/delivery/git_repos'
+    exclude ['*/*/*/*/*/hooks/*']
+    target '/var/opt/delivery/delivery/git_repos'
+    delay 0
+    delete true
+    rsync_opts ['-a', '-e', 'ssh -l delivery -i /opt/delivery/embedded/.ssh/insecure_private_key -o StrictHostKeyChecking=no']
+    notifies :restart, 'service[lsyncd]', :delayed if node['delivery']['fqdn'] === 'delivery-primary.example.com'
+  end
+
+  lsyncd_target 'git_workspace' do
+    mode 'rsync'
+    user 'delivery'
+    host 'delivery-secondary.example.com'
+    source '/var/opt/delivery/delivery/git_workspace'
+    target '/var/opt/delivery/delivery/git_workspace'
+    delay 0
+    delete true
+    rsync_opts ['-a', '-e', 'ssh -l delivery -i /opt/delivery/embedded/.ssh/insecure_private_key -o StrictHostKeyChecking=no']
+    notifies :restart, 'service[lsyncd]', :delayed if node['delivery']['fqdn'] === 'delivery-primary.example.com'
+  end
+else
+  rewind 'service[lsyncd]' do
+    action :stop
+  end
+
+  # Setup syncs
+  lsyncd_target 'git_repos' do
+    mode 'rsync'
+    user 'delivery'
+    host 'delivery-primary.example.com'
+    source '/var/opt/delivery/delivery/git_repos'
+    exclude ['*/*/*/*/*/hooks/*']
+    target '/var/opt/delivery/delivery/git_repos'
+    delay 0
+    delete true
+    rsync_opts ['-a', '-e', 'ssh -l delivery -i /opt/delivery/embedded/.ssh/insecure_private_key -o StrictHostKeyChecking=no']
+  end
+
+  lsyncd_target 'git_workspace' do
+    mode 'rsync'
+    user 'delivery'
+    host 'delivery-primary.example.com'
+    source '/var/opt/delivery/delivery/git_workspace'
+    target '/var/opt/delivery/delivery/git_workspace'
+    delay 0
+    delete true
+    rsync_opts ['-a', '-e', 'ssh -l delivery -i /opt/delivery/embedded/.ssh/insecure_private_key -o StrictHostKeyChecking=no']
   end
 end
