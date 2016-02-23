@@ -20,5 +20,7 @@ end
 execute 'create example enterprise' do
   command 'delivery-ctl create-enterprise example --ssh-pub-key-file=/etc/delivery/builder_key.pub > /tmp/example.creds'
   not_if "delivery-ctl list-enterprises --ssh-pub-key-file=/etc/delivery/builder_key.pub | grep -w example"
+  retries 3
+  retry_delay 5
   action :nothing
 end

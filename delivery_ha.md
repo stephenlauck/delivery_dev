@@ -59,3 +59,11 @@ Flow of data:
 `kitchen exec delivery-primary-cent -c 'cat /tmp/example.creds'`
 
 `kitchen exec delivery-secondary-cent -c 'cat /tmp/example.creds'`
+
+
+Demo Script:
+existing repo change goes through verify
+add new repo
+fail over
+push new change on existing and see it verify
+push new change on new
