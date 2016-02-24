@@ -14,11 +14,10 @@ end
 
 ingredient_config "delivery" do
   notifies :reconfigure, "chef_ingredient[delivery]", :immediately
-  notifies :run, "execute[create example enterprise]"
 end
 
 execute 'create example enterprise' do
   command 'delivery-ctl create-enterprise example --ssh-pub-key-file=/etc/delivery/builder_key.pub > /tmp/example.creds'
   not_if "delivery-ctl list-enterprises --ssh-pub-key-file=/etc/delivery/builder_key.pub | grep -w example"
-  action :nothing
+  creates "/tmp/example.creds"
 end
